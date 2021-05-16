@@ -41,7 +41,7 @@ func main() {
 
 func run(c *cli.Context) error {
 	fmt.Printf("input: %v",c.StringSlice("input"))
-	fmt.Println(c.String("output"))
+	fmt.Printf("output: %v",c.String("output"))
 	plugin := Plugin{
 		Input: c.StringSlice("input"),
 		Output: c.String("output"),
