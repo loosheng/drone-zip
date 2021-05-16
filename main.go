@@ -40,8 +40,8 @@ func main() {
 }
 
 func run(c *cli.Context) error {
-	fmt.Printf("input: %v",c.StringSlice("input"))
-	fmt.Printf("output: %v",c.String("output"))
+	fmt.Printf("input: %v\n",c.StringSlice("input"))
+	fmt.Printf("output: %v\n",c.String("output"))
 	plugin := Plugin{
 		Input: c.StringSlice("input"),
 		Output: c.String("output"),
