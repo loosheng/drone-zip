@@ -1,0 +1,9 @@
+dist
+
+.idea
+
+drone-zip
+
+drone-zip*
+
+.DS_Store
