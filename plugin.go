@@ -43,7 +43,7 @@ func (p Plugin) Exec() error {
 }
 
 func Zip(dst string, src []string) (err error) {
-	fw, err := os.Create(dst)
+	fw, err := os.Create(filepath.Join(dst))
 	defer func(fw *os.File) {
 		err := fw.Close()
 		if err != nil {
