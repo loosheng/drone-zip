@@ -7,7 +7,7 @@ on:
 
 jobs:
   release:
-    name: publish release, upload asset
+    name: release and publish to dockerhub
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
