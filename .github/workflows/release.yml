@@ -33,4 +33,4 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ steps.vars.outputs.tag }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/drone-zip:${{ steps.vars.outputs.tag }}
