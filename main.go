@@ -25,12 +25,12 @@ func main() {
 		cli.StringSliceFlag{
 			Name:   "input",
 			Usage:  "file input eg: a.txt, /app/a.txt , 'a/*.js'",
-			EnvVar: "ZIP_FILES",
+			EnvVar: "PLUGIN_FILES,ZIP_FILES",
 		},
 		cli.StringFlag{
 			Name:   "output",
 			Usage:  "output zip file path eg: /app/a.zip",
-			EnvVar: "OUTPUT_PATH",
+			EnvVar: "PLUGIN_OUTPUT,ZIP_OUTPUT",
 		},
 	}
 	if err := app.Run(os.Args); err != nil {
@@ -40,10 +40,10 @@ func main() {
 }
 
 func run(c *cli.Context) error {
-	fmt.Printf("input: %v\n",c.StringSlice("input"))
-	fmt.Printf("output: %v\n",c.String("output"))
+	fmt.Printf("input: %v\n", c.StringSlice("input"))
+	fmt.Printf("output: %v\n", c.String("output"))
 	plugin := Plugin{
-		Input: c.StringSlice("input"),
+		Input:  c.StringSlice("input"),
 		Output: c.String("output"),
 	}
 

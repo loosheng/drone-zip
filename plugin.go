@@ -3,14 +3,15 @@ package main
 import (
 	"archive/zip"
 	"fmt"
-	"github.com/sirupsen/logrus"
 	"io"
 	"os"
 	"path/filepath"
+
+	"github.com/sirupsen/logrus"
 )
 
 type Plugin struct {
-	Input []string
+	Input  []string
 	Output string
 }
 
@@ -29,21 +30,24 @@ func (p Plugin) Exec() error {
 	)
 
 	for _, inputPath := range p.Input {
-		paths, err := filepath.Glob(filepath.Join(inputPath))
+		paths, err := filepath.Glob(inputPath)
 		if err != nil {
 			return err
 		}
 		input = append(input, paths...)
 	}
 
-	if err := Zip(p.Output, input); err != nil {
-		return fmt.Errorf("packagingFailure : %v", err)
-	}
+	Zip(p.Output, input)
 	return nil
 }
 
-func Zip(dst string, src []string) (err error) {
-	fw, err := os.Create(filepath.Join(dst))
+func Zip(dst string, src []string) {
+	abs, err := filepath.Abs(dst)
+	if err != nil {
+		logrus.Fatal(err)
+	}
+	fmt.Printf("dst path: %v \n", abs)
+	fw, err := os.Create(dst)
 	defer func(fw *os.File) {
 		err := fw.Close()
 		if err != nil {
@@ -51,7 +55,7 @@ func Zip(dst string, src []string) (err error) {
 		}
 	}(fw)
 	if err != nil {
-		return err
+		logrus.Fatal(err)
 	}
 
 	zw := zip.NewWriter(fw)
@@ -63,14 +67,19 @@ func Zip(dst string, src []string) (err error) {
 	}()
 
 	for _, path := range src {
+		if _, err := os.Stat(path); os.IsNotExist(err) {
+			logrus.Errorf("file: %v does not exist",path)
+		}
+
 		file, err := os.Lstat(path)
+
 		if err != nil {
-			return fmt.Errorf("get %s fileinfo error: %v \n", path, err)
+			logrus.Errorf("get %s fileinfo error: %v", path, err)
 		}
 
 		fh, err := zip.FileInfoHeader(file)
 		if err != nil {
-			return fmt.Errorf("get zip FileInfoHeader err: %v", err)
+			logrus.Errorf("get zip FileInfoHeader err: %v", err)
 		}
 
 		fh.Name = file.Name()
@@ -80,22 +89,22 @@ func Zip(dst string, src []string) (err error) {
 		}
 		w, err := zw.CreateHeader(fh)
 		if err != nil {
-			return err
+			logrus.Fatal(err)
 		}
 
 		if !fh.Mode().IsRegular() {
-			return nil
+			continue
 		}
 
 		n, err := CopyFileToWriter(path, w)
 		if err != nil {
-			return err
+			logrus.Fatal(err)
 		}
 
 		fmt.Printf("Successful file compression: %s, A total of %.2f KB bytes of data was written\n", path, float64(n)/float64(1024))
 
 	}
-	return nil
+
 }
 
 func CopyFileToWriter(path string, writer io.Writer) (int64, error) {
