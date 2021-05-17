@@ -15,7 +15,7 @@ jobs:
       - name: Set output
         id: vars
         run: |
-          DOCKER_IMAGE=owmurong/drone-zip
+          DOCKER_IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/drone-zip
           VERSION=${GITHUB_REF#refs/tags/v}
           TAGS="${DOCKER_IMAGE}:${VERSION},${DOCKER_IMAGE}:latest"
           echo ::set-output name=tags::${TAGS}
