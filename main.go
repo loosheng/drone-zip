@@ -25,7 +25,7 @@ func main() {
 		cli.StringSliceFlag{
 			Name:   "input",
 			Usage:  "file input eg: a.txt, /app/a.txt , 'a/*.js'",
-			EnvVar: "PLUGIN_FILES,ZIP_FILES",
+			EnvVar: "PLUGIN_INPUT,ZIP_INPUT",
 		},
 		cli.StringFlag{
 			Name:   "output",
