@@ -10,21 +10,30 @@ trigger:
     - push
     - pull_request
 steps:
-  - name: create file
+  - name: List all files
     pull: always
     image: drone/git
     commands:
-      - echo aa0.0.6 > /app/a.txt
-      - ls /app
+      - find "$PWD"
   - name: zip file
-    pull: always
     image: lunagod/drone-zip
     settings:
       input: 
-        - /app/a.txt
-      output: /app/a.zip
-  - name: ls file
-    pull: always
+        - test/**/*
+      output: test1.zip
+  - name: zip js file
+    image: lunagod/drone-zip
+    settings:
+      input: 
+        - test/**/*.js
+      output: test-js.zip
+  - name: zip txt file
+    image: lunagod/drone-zip
+    settings:
+      input: 
+        - test/**/*.js
+      output: test-txt.zip
+  - name: List all files
     image: drone/git
     commands:
-      - ls /app 
+      - find "$PWD"
