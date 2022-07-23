@@ -6,7 +6,7 @@ on:
 
 jobs:
   release:
-    name: release and publish to dockerhub
+    name: Build Test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
