@@ -8,6 +8,7 @@ workspace:
 trigger:
   event: 
     - push
+    - pull_request
 steps:
   - name: create file
     pull: always
