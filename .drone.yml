@@ -14,7 +14,7 @@ steps:
     pull: always
     image: drone/git
     commands:
-      - find "$PWD"
+      - find "$PWD" | grep -v .git
   - name: zip file
     image: lunagod/drone-zip
     settings:
@@ -36,4 +36,4 @@ steps:
   - name: List all files
     image: drone/git
     commands:
-      - find "$PWD"
+      - find "$PWD" | grep -v .git
