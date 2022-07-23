@@ -35,8 +35,6 @@ func (p Plugin) Exec() error {
 			logrus.Fatalf("glob error: %v", err)
 		}
 
-		logrus.Infof("matchedPath %s success", matchedPath)
-
 		for _, path := range matchedPath {
 			if !IsDir(path) {
 				input = append(input, path)
