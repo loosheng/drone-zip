@@ -1,0 +1,29 @@
+kind: pipeline
+name: testing-amd64-drone
+type: docker
+
+workspace: 
+  path: /app
+
+trigger:
+  event: 
+    - push
+steps:
+  - name: create file
+    pull: always
+    image: drone/git
+    commands:
+      - echo aa0.0.6 > /app/a.txt
+      - ls /app
+  - name: zip file
+    pull: always
+    image: lunagod/drone-zip
+    settings:
+      input: 
+        - /app/a.txt
+      output: /app/a.zip
+  - name: ls file
+    pull: always
+    image: drone/git
+    commands:
+      - ls /app 
