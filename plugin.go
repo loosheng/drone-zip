@@ -3,17 +3,16 @@ package main
 import (
 	"io"
 	"os"
-	"path/filepath"
 	"strings"
 
+	glob "github.com/bmatcuk/doublestar/v4"
 	"github.com/klauspost/compress/zip"
 	"github.com/sirupsen/logrus"
 )
 
 type Plugin struct {
-	Input   []string
-	Output  string
-	Exclude []string
+	Input  []string
+	Output string
 }
 
 func (p Plugin) Exec() error {
@@ -31,21 +30,17 @@ func (p Plugin) Exec() error {
 	)
 
 	for _, inputPath := range p.Input {
-		if !IsDir(inputPath) {
-			input = append(input, inputPath)
-		} else {
-			filepath.Walk(inputPath, func(path string, info os.FileInfo, err error) error {
-				if err != nil {
-					logrus.Fatalf("get %s fileinfo error: %v", path, err)
-				}
+		matchedPath, err := glob.FilepathGlob(inputPath)
+		if err != nil {
+			logrus.Fatalf("glob error: %v", err)
+		}
 
-				if info.Mode().IsDir() || Contains(p.Exclude, path) {
-					return nil
-				}
+		logrus.Infof("matchedPath %s success", matchedPath)
 
+		for _, path := range matchedPath {
+			if !IsDir(path) {
 				input = append(input, path)
-				return nil
-			})
+			}
 		}
 	}
 
