@@ -17,5 +17,5 @@ jobs:
           go-version: 1.18
       - run: env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o release/drone-zip-release
       - run: |
-          ./drone-zip --output test.zip --input "test/**/*.js"
+          ./release/drone-zip-release --output test.zip --input "test/**/*.js"
           find "$PWD"
