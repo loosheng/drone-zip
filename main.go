@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/sirupsen/logrus"
@@ -32,6 +31,11 @@ func main() {
 			Usage:  "output zip file path eg: /app/a.zip",
 			EnvVar: "PLUGIN_OUTPUT,ZIP_OUTPUT",
 		},
+		cli.StringSliceFlag{
+			Name:   "exclude",
+			Usage:  "exclude file",
+			EnvVar: "PLUGIN_EXCLUDE,ZIP_EXCLUDE",
+		},
 	}
 	if err := app.Run(os.Args); err != nil {
 		logrus.Fatal(err)
@@ -40,12 +44,16 @@ func main() {
 }
 
 func run(c *cli.Context) error {
-	fmt.Printf("input: %v\n", c.StringSlice("input"))
-	fmt.Printf("output: %v\n", c.String("output"))
+
 	plugin := Plugin{
-		Input:  c.StringSlice("input"),
-		Output: c.String("output"),
+		Input:   c.StringSlice("input"),
+		Output:  c.String("output"),
+		Exclude: c.StringSlice("exclude"),
 	}
+
+	logrus.Infof("input: %v", plugin.Input)
+	logrus.Infof("output: %v\n", plugin.Output)
+	logrus.Infof("exclude: %v\n", plugin.Exclude)
 
 	return plugin.Exec()
 }

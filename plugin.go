@@ -1,28 +1,29 @@
 package main
 
 import (
-	"archive/zip"
-	"fmt"
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 
+	"github.com/klauspost/compress/zip"
 	"github.com/sirupsen/logrus"
 )
 
 type Plugin struct {
-	Input  []string
-	Output string
+	Input   []string
+	Output  string
+	Exclude []string
 }
 
 func (p Plugin) Exec() error {
 
 	if len(p.Input) == 0 {
-		return fmt.Errorf("please enter the file or directory to be packed")
+		logrus.Fatalf("please enter the file or directory to be packed")
 	}
 
 	if p.Output == "" {
-		return fmt.Errorf("please enter the zip output path")
+		logrus.Fatalf("please enter the zip output path")
 	}
 
 	var (
@@ -30,101 +31,78 @@ func (p Plugin) Exec() error {
 	)
 
 	for _, inputPath := range p.Input {
-		paths, err := filepath.Glob(inputPath)
-		if err != nil {
-			return err
+		if !IsDir(inputPath) {
+			input = append(input, inputPath)
+		} else {
+			filepath.Walk(inputPath, func(path string, info os.FileInfo, err error) error {
+				if err != nil {
+					logrus.Fatalf("get %s fileinfo error: %v", path, err)
+				}
+
+				if info.Mode().IsDir() || Contains(p.Exclude, path) {
+					return nil
+				}
+
+				input = append(input, path)
+				return nil
+			})
 		}
-		input = append(input, paths...)
 	}
+
+	logrus.Infof("input path: %v", input)
 
 	Zip(p.Output, input)
 	return nil
 }
 
-func Zip(dst string, src []string) {
-	abs, err := filepath.Abs(dst)
+func Zip(fileName string, inputList []string) {
+	fw, err := os.Create(fileName)
+
 	if err != nil {
-		logrus.Fatal(err)
-	}
-	fmt.Printf("dst path: %v \n", abs)
-	fw, err := os.Create(dst)
-	defer func(fw *os.File) {
-		err := fw.Close()
-		if err != nil {
-			logrus.Fatal(err)
-		}
-	}(fw)
-	if err != nil {
-		logrus.Fatal(err)
+		logrus.Fatalf("create %s error: %v", fileName, err)
 	}
 
-	zw := zip.NewWriter(fw)
-	defer func() {
-		// 检测一下是否成功关闭
-		if err := zw.Close(); err != nil {
-			logrus.Fatal(err)
-		}
-	}()
+	w := zip.NewWriter(fw)
+	defer w.Close()
 
-	for _, path := range src {
-		if _, err := os.Stat(path); os.IsNotExist(err) {
-			logrus.Errorf("file: %v does not exist",path)
-		}
-
-		file, err := os.Lstat(path)
-
+	for _, input := range inputList {
+		targetFile, err := w.Create(input)
 		if err != nil {
-			logrus.Errorf("get %s fileinfo error: %v", path, err)
+			logrus.Fatalf("create %s file error: %v", input, err)
 		}
 
-		fh, err := zip.FileInfoHeader(file)
+		sourceFile, err := os.Open(input)
 		if err != nil {
-			logrus.Errorf("get zip FileInfoHeader err: %v", err)
+			logrus.Fatalf("open %s file error: %v", input, err)
 		}
+		defer sourceFile.Close()
 
-		fh.Name = file.Name()
-
-		if file.IsDir() {
-			fh.Name += "/"
-		}
-		w, err := zw.CreateHeader(fh)
+		_, err = io.Copy(targetFile, sourceFile)
 		if err != nil {
-			logrus.Fatal(err)
+			logrus.Fatalf("compression %s file error: %v", input, err)
 		}
 
-		if !fh.Mode().IsRegular() {
-			continue
-		}
-
-		n, err := CopyFileToWriter(path, w)
-		if err != nil {
-			logrus.Fatal(err)
-		}
-
-		fmt.Printf("Successful file compression: %s, A total of %.2f KB bytes of data was written\n", path, float64(n)/float64(1024))
-
+		logrus.Infof("compression %s file success", input)
 	}
-
 }
 
-func CopyFileToWriter(path string, writer io.Writer) (int64, error) {
-	fr, err := os.Open(path)
-
-	defer func(fr *os.File) {
-		err := fr.Close()
-		if err != nil {
-			logrus.Fatal(err)
+func Contains(s []string, item string) bool {
+	for _, str := range s {
+		if str == item || strings.Contains(str, item) {
+			return true
 		}
-	}(fr)
-
-	if err != nil {
-		logrus.Fatal(err)
 	}
+	return false
+}
 
-	number, err := io.Copy(writer, fr)
+func FileExist(path string) bool {
+	_, err := os.Stat(path)
+	return err == nil
+}
+func IsDir(path string) bool {
+	info, err := os.Stat(path)
 	if err != nil {
-		return 0, err
+		return false
 	}
-
-	return number, err
+	return info.Mode().IsDir()
 }
