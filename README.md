@@ -17,5 +17,7 @@ steps:
     input: 
       - a.txt
       - a/*.js # globs are allowed
+      - a/**/*.js # Recursive Match
+      - a/**/* # Recursive Match
     output: release.zip
 ```
