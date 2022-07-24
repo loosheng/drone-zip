@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/sirupsen/logrus"
@@ -9,7 +8,7 @@ import (
 )
 
 var (
-	version = "0.0.1"
+	version = "1.1.0"
 )
 
 func main() {
@@ -24,7 +23,7 @@ func main() {
 	app.Flags = []cli.Flag{
 		cli.StringSliceFlag{
 			Name:   "input",
-			Usage:  "file input eg: a.txt, /app/a.txt , 'a/*.js'",
+			Usage:  "file input eg: a.txt, /app/a.txt , a/*.js,test/**/*.js",
 			EnvVar: "PLUGIN_INPUT,ZIP_INPUT",
 		},
 		cli.StringFlag{
@@ -40,12 +39,14 @@ func main() {
 }
 
 func run(c *cli.Context) error {
-	fmt.Printf("input: %v\n", c.StringSlice("input"))
-	fmt.Printf("output: %v\n", c.String("output"))
+
 	plugin := Plugin{
 		Input:  c.StringSlice("input"),
 		Output: c.String("output"),
 	}
+
+	logrus.Infof("input: %v", plugin.Input)
+	logrus.Infof("output: %v\n", plugin.Output)
 
 	return plugin.Exec()
 }

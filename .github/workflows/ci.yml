@@ -1,0 +1,21 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  release:
+    name: Build Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.18
+      - run: env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o release/drone-zip-release
+      - run: |
+          ./release/drone-zip-release --output test.zip --input "test/**/*.js"
+          find "$PWD" | grep -v .git
