@@ -30,19 +30,10 @@ func (p Plugin) Exec() error {
 	)
 
 	for _, inputPath := range p.Input {
-		matchedPath, err := glob.FilepathGlob(inputPath)
-		if err != nil {
-			logrus.Fatalf("glob error: %v", err)
-		}
-
-		for _, path := range matchedPath {
-			if !IsDir(path) {
-				input = append(input, path)
-			}
-		}
+		filePath := getFilePaths(inputPath)
+		input = append(input, filePath...)
 	}
-
-	logrus.Infof("input path: %v", input)
+	logrus.Infof("glob path: %s", input)
 
 	Zip(p.Output, input)
 	return nil
@@ -92,10 +83,38 @@ func FileExist(path string) bool {
 	_, err := os.Stat(path)
 	return err == nil
 }
+
 func IsDir(path string) bool {
 	info, err := os.Stat(path)
 	if err != nil {
 		return false
 	}
 	return info.Mode().IsDir()
+}
+
+func getFilePaths(path string) []string {
+	var paths []string
+	var patternPath string
+
+	if IsDir(path) {
+		patternPath = "/**/*"
+	} else {
+		patternPath = path
+	}
+
+	globedPaths, err := glob.FilepathGlob(patternPath)
+	if err != nil {
+		logrus.Fatalf("glob error: %v", err)
+	}
+
+	paths = append(paths, globedPaths...)
+
+	// remove directory
+	for i, path := range paths {
+		if IsDir(path) {
+			paths = append(paths[:i], paths[i+1:]...)
+		}
+	}
+
+	return paths
 }
