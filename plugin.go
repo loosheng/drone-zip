@@ -97,7 +97,7 @@ func getFilePaths(path string) []string {
 	var patternPath string
 
 	if IsDir(path) {
-		patternPath = "/**/*"
+		patternPath = path + "/**/*"
 	} else {
 		patternPath = path
 	}
