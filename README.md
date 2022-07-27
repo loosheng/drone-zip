@@ -1,9 +1,16 @@
 # drone-zip
-Drone CI  plugin, use archive/zip for compressed files.
+Drone CI  plugin, use [compress](https://github.com/klauspost/compress) for compressed files.
 
-<a href="https://github.com/LunaGod/drone-zip/actions/workflows/release.yml">
-  <img src="https://github.com/LunaGod/drone-zip/actions/workflows/release.yml/badge.svg?tags=latest" alt="build status">
+<a href="https://github.com/loosheng/drone-zip/actions/workflows/release.yml">
+  <img src="https://github.com/loosheng/drone-zip/actions/workflows/release.yml/badge.svg?tags=latest" alt="build status">
 </a>
+<a href="https://github.com/loosheng/drone-zip/actions/workflows/ci.yml">
+  <img src="https://github.com/loosheng/drone-zip/actions/workflows/ci.yml/badge.svg?tags=latest" alt="build status">
+</a>
+
+  <a href="https://hub.docker.com/r/lunagod/drone-zip" title="Docker pulls">
+    <img src="https://img.shields.io/docker/pulls/lunagod/drone-zip">
+  </a>
 
 ### Drone CI Plugin Config
 
