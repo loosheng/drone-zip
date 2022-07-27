@@ -45,6 +45,7 @@ func Zip(fileName string, inputList []string) {
 	if err != nil {
 		logrus.Fatalf("create %s error: %v", fileName, err)
 	}
+	defer fw.Close()
 
 	w := zip.NewWriter(fw)
 	defer w.Close()
