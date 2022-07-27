@@ -19,5 +19,6 @@ steps:
       - a/*.js # globs are allowed
       - a/**/*.js # recursive match .js file
       - a/**/* # recursive match all file
+      - ./a # recursively compress the a folder
     output: release.zip
 ```
