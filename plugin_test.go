@@ -1,10 +1,136 @@
 package main
 
 import (
+	"archive/zip"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
+
+func TestPlugin(t *testing.T) {
+
+	t.Run("zip file ./test/*", func(t *testing.T) {
+		tmpDir := t.TempDir()
+		t.Logf("tmpDir: %v", tmpDir)
+		p := Plugin{
+			Input:  []string{"./test/*"},
+			Output: filepath.Join(tmpDir, "test.zip"),
+		}
+		p.Exec()
+
+		assert.Equal(
+			t,
+			[]string{
+				"test/a.txt",
+				"test/b.js",
+			},
+			zipFiles(t, filepath.Join(tmpDir, "test.zip")),
+		)
+
+	})
+
+	t.Run("zip file ./test", func(t *testing.T) {
+		tmpDir := t.TempDir()
+		t.Logf("tmpDir: %v", tmpDir)
+		p := Plugin{
+			Input:  []string{"./test"},
+			Output: filepath.Join(tmpDir, "dot-test.zip"),
+		}
+		p.Exec()
+
+		assert.Equal(
+			t,
+			[]string{
+				"test/a.txt",
+				"test/b.js",
+				"test/foo/a.js",
+				"test/foo/b.txt",
+				"test/foo/bar/bar.js"},
+			zipFiles(t, filepath.Join(tmpDir, "dot-test.zip")),
+		)
+
+	})
+
+	t.Run("zip file ./test/**/*", func(t *testing.T) {
+		tmpDir := t.TempDir()
+		t.Logf("tmpDir: %v", tmpDir)
+		p := Plugin{
+			Input:  []string{"./test/**/*"},
+			Output: filepath.Join(tmpDir, "db-star-test.zip"),
+		}
+		p.Exec()
+
+		assert.Equal(
+			t,
+			[]string{
+				"test/a.txt",
+				"test/b.js",
+				"test/foo/a.js",
+				"test/foo/b.txt",
+				"test/foo/bar/bar.js",
+			},
+			zipFiles(t, filepath.Join(tmpDir, "db-star-test.zip")),
+		)
+
+	})
+
+	t.Run("zip file ./test/**/*.js", func(t *testing.T) {
+		tmpDir := t.TempDir()
+		t.Logf("tmpDir: %v", tmpDir)
+		p := Plugin{
+			Input:  []string{"./test/**/*.js"},
+			Output: filepath.Join(tmpDir, "db-star-js-test.zip"),
+		}
+		p.Exec()
+
+		assert.Equal(
+			t,
+			[]string{
+				"test/b.js",
+				"test/foo/a.js",
+				"test/foo/bar/bar.js",
+			},
+			zipFiles(t, filepath.Join(tmpDir, "db-star-js-test.zip")),
+		)
+	})
+
+	t.Run("zip file ./test/**/*.txt", func(t *testing.T) {
+		tmpDir := t.TempDir()
+		t.Logf("tmpDir: %v", tmpDir)
+		p := Plugin{
+			Input:  []string{"./test/**/*.txt"},
+			Output: filepath.Join(tmpDir, "db-star-txt-test.zip"),
+		}
+		p.Exec()
+
+		assert.Equal(
+			t,
+			[]string{
+				"test/a.txt",
+				"test/foo/b.txt",
+			},
+			zipFiles(t, filepath.Join(tmpDir, "db-star-txt-test.zip")),
+		)
+	})
+
+}
+
+func zipFiles(t *testing.T, path string) []string {
+	t.Helper()
+	f, err := os.Open(path)
+	assert.NoError(t, err)
+	info, err := f.Stat()
+	assert.NoError(t, err)
+	r, err := zip.NewReader(f, info.Size())
+	assert.NoError(t, err)
+	paths := make([]string, len(r.File))
+	for i, zf := range r.File {
+		paths[i] = zf.Name
+	}
+	return paths
+}
 
 func TestIsDir(t *testing.T) {
 
