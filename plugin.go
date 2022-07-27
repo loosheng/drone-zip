@@ -45,6 +45,7 @@ func Zip(fileName string, inputList []string) {
 	if err != nil {
 		logrus.Fatalf("create %s error: %v", fileName, err)
 	}
+	defer fw.Close()
 
 	w := zip.NewWriter(fw)
 	defer w.Close()
@@ -79,11 +80,6 @@ func Contains(s []string, item string) bool {
 	return false
 }
 
-func FileExist(path string) bool {
-	_, err := os.Stat(path)
-	return err == nil
-}
-
 func IsDir(path string) bool {
 	info, err := os.Stat(path)
 	if err != nil {
@@ -97,7 +93,7 @@ func getFilePaths(path string) []string {
 	var patternPath string
 
 	if IsDir(path) {
-		patternPath = "/**/*"
+		patternPath = path + "/**/*"
 	} else {
 		patternPath = path
 	}
