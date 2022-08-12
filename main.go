@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	version = "1.1.0"
+	version = "1.1.2"
 )
 
 func main() {
@@ -44,7 +44,7 @@ func run(c *cli.Context) error {
 		Input:  c.StringSlice("input"),
 		Output: c.String("output"),
 	}
-
+	logrus.Infof("drone-zip version: %s", version)
 	logrus.Infof("input: %v", plugin.Input)
 	logrus.Infof("output: %v\n", plugin.Output)
 
