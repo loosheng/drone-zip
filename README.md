@@ -1,5 +1,5 @@
 # drone-zip
-Woodpecker CI (or Drone CI)  plugin, use [compress](https://github.com/klauspost/compress) for compressed files.
+Woodpecker-CI (or Drone-CI)  plugin, use [compress](https://github.com/klauspost/compress) for compressed files.
 
 <a href="https://github.com/loosheng/drone-zip/actions/workflows/release.yml">
   <img src="https://github.com/loosheng/drone-zip/actions/workflows/release.yml/badge.svg?tags=latest" alt="build status">
