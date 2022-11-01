@@ -1,11 +1,11 @@
 # drone-zip
 Woodpecker-CI (or Drone-CI)  plugin, use [compress](https://github.com/klauspost/compress) for compressed files.
 
-<a href="https://github.com/loosheng/drone-zip/actions/workflows/release.yml">
-  <img src="https://github.com/loosheng/drone-zip/actions/workflows/release.yml/badge.svg?tags=latest" alt="build status">
+<a href="https://github.com/rasho7/drone-zip/actions/workflows/release.yml">
+  <img src="https://github.com/rasho7/drone-zip/actions/workflows/release.yml/badge.svg?tags=latest" alt="build status">
 </a>
-<a href="https://github.com/loosheng/drone-zip/actions/workflows/ci.yml">
-  <img src="https://github.com/loosheng/drone-zip/actions/workflows/ci.yml/badge.svg?tags=latest" alt="build status">
+<a href="https://github.com/rasho7/drone-zip/actions/workflows/ci.yml">
+  <img src="https://github.com/rasho7/drone-zip/actions/workflows/ci.yml/badge.svg?tags=latest" alt="build status">
 </a>
 
   <a href="https://hub.docker.com/r/lunagod/drone-zip" title="Docker pulls">
