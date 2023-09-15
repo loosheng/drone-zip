@@ -123,7 +123,7 @@ func TestOutput(t *testing.T) {
 		tmpDir := t.TempDir()
 		t.Logf("tmpDir: %v", tmpDir)
 		p := Plugin{
-			Input:  []string{"test/output-9071a1942d0d334aa224a1370d98e18015782d6f"},
+			Input:  []string{"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f"},
 			Output: filepath.Join(tmpDir, "output-9071a1942d0d334aa224a1370d98e18015782d6f.zip"),
 		}
 		p.Exec()
@@ -131,22 +131,22 @@ func TestOutput(t *testing.T) {
 		assert.Equal(
 			t,
 			[]string{
-				"test/output-9071a1942d0d334aa224a1370d98e18015782d6f/404.html",
-				"test/output-9071a1942d0d334aa224a1370d98e18015782d6f/begriffe.html",
-				"test/output-9071a1942d0d334aa224a1370d98e18015782d6f/datenschutz.html",
-				"test/output-9071a1942d0d334aa224a1370d98e18015782d6f/feed_rss_created.xml",
-				"test/output-9071a1942d0d334aa224a1370d98e18015782d6f/feed_rss_updated.xml",
-				"test/output-9071a1942d0d334aa224a1370d98e18015782d6f/impressum.html",
-				"test/output-9071a1942d0d334aa224a1370d98e18015782d6f/index.html",
-				"test/output-9071a1942d0d334aa224a1370d98e18015782d6f/sitemap.xml",
-				"test/output-9071a1942d0d334aa224a1370d98e18015782d6f/sitemap.xml.gz",
-				"test/output-9071a1942d0d334aa224a1370d98e18015782d6f/rechtsformen/index.html",
-				"test/output-9071a1942d0d334aa224a1370d98e18015782d6f/rechtsformen/test/1.html",
-				"test/output-9071a1942d0d334aa224a1370d98e18015782d6f/rechtsformen/test/2.html",
-				"test/output-9071a1942d0d334aa224a1370d98e18015782d6f/rechtsformen/test/3.html",
-				"test/output-9071a1942d0d334aa224a1370d98e18015782d6f/rechtsformen/test/index.html",
-				"test/output-9071a1942d0d334aa224a1370d98e18015782d6f/search/search_index.js",
-				"test/output-9071a1942d0d334aa224a1370d98e18015782d6f/search/search_index.json",
+				"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/404.html",
+				"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/begriffe.html",
+				"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/datenschutz.html",
+				"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/feed_rss_created.xml",
+				"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/feed_rss_updated.xml",
+				"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/impressum.html",
+				"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/index.html",
+				"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/sitemap.xml",
+				"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/sitemap.xml.gz",
+				"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/rechtsformen/index.html",
+				"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/rechtsformen/test/1.html",
+				"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/rechtsformen/test/2.html",
+				"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/rechtsformen/test/3.html",
+				"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/rechtsformen/test/index.html",
+				"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/search/search_index.js",
+				"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/search/search_index.json",
 			},
 			zipFiles(t, filepath.Join(tmpDir, "output-9071a1942d0d334aa224a1370d98e18015782d6f.zip")),
 		)
