@@ -89,7 +89,7 @@ func IsDir(path string) bool {
 }
 
 func getFilePaths(path string) []string {
-	var paths []string
+	var paths, resultPaths []string
 	var patternPath string
 
 	if IsDir(path) {
@@ -106,11 +106,11 @@ func getFilePaths(path string) []string {
 	paths = append(paths, globedPaths...)
 
 	// remove directory
-	for i, path := range paths {
-		if IsDir(path) {
-			paths = append(paths[:i], paths[i+1:]...)
+	for _, path := range paths {
+		if !IsDir(path) {
+			resultPaths = append(resultPaths, path)
 		}
 	}
 
-	return paths
+	return resultPaths
 }
