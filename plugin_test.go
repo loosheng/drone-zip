@@ -38,17 +38,6 @@ func TestPlugin(t *testing.T) {
 		}
 		p.Exec()
 
-		assert.Equal(
-			t,
-			[]string{
-				"test/a.txt",
-				"test/b.js",
-				"test/foo/a.js",
-				"test/foo/b.txt",
-				"test/foo/bar/bar.js"},
-			zipFiles(t, filepath.Join(tmpDir, "dot-test.zip")),
-		)
-
 		expectedFiles := []string{
 			"test/a.txt",
 			"test/b.js",
