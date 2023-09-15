@@ -2,8 +2,11 @@ package main
 
 import (
 	"io"
+	"math"
 	"os"
+	"runtime"
 	"strings"
+	"sync"
 
 	glob "github.com/bmatcuk/doublestar/v4"
 	"github.com/klauspost/compress/zip"
@@ -49,31 +52,78 @@ func Zip(fileName string, inputList []string) {
 	w := zip.NewWriter(fw)
 	defer w.Close()
 
+	// set maxGoroutines
+	cpu80Percent := int(math.Ceil(float64(runtime.NumCPU()) * 0.8))
+	fileCount := len(inputList)
+	maxGoroutines := min(cpu80Percent, fileCount)
+
+	sem := make(chan struct{}, maxGoroutines)
+	errCh := make(chan error, fileCount)
+	quit := make(chan struct{})
+	wg := &sync.WaitGroup{}
+
 	for _, input := range inputList {
-		if err := addFileToZip(w, input); err != nil {
-			logrus.Fatalf("%v", err)
+		select {
+		case <-quit:
+			return
+		default:
+			wg.Add(1)
+			sem <- struct{}{}
+
+			go func(filePath string) {
+				defer wg.Done()
+				defer func() { <-sem }() // Release semaphore.
+
+				if err := addFileToZip(w, filePath); err != nil {
+					select {
+					case errCh <- err:
+					case <-quit: // If other goroutines have already detected an error, do not send.
+					}
+				}
+			}(input)
 		}
-		logrus.Infof("compression %s file success", input)
+	}
+
+	go func() {
+		wg.Wait()
+		close(errCh)
+	}()
+
+	for err := range errCh {
+		if err != nil {
+			close(quit) // When an error is detected, notify all goroutines to stop.
+			logrus.Fatalf("%v", err)
+			return
+		}
 	}
 }
 
-func addFileToZip(w *zip.Writer, input string) error {
-	targetFile, err := w.Create(input)
+func addFileToZip(w *zip.Writer, filePath string) error {
+	targetFile, err := w.Create(filePath)
 	if err != nil {
-		logrus.Fatalf("create %s file error: %v", input, err)
+		return err
 	}
 
-	sourceFile, err := os.Open(input)
+	sourceFile, err := os.Open(filePath)
 	if err != nil {
-		logrus.Fatalf("open %s file error: %v", input, err)
+		return err
 	}
+	defer sourceFile.Close()
 
 	_, err = io.Copy(targetFile, sourceFile)
-	sourceFile.Close() // 手动关闭文件
 	if err != nil {
-		logrus.Fatalf("compression %s file error: %v", input, err)
+		return err
 	}
+
+	logrus.Infof("compression %s file success", filePath)
 	return nil
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }
 
 func Contains(s []string, item string) bool {

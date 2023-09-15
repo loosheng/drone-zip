@@ -20,14 +20,12 @@ func TestPlugin(t *testing.T) {
 		}
 		p.Exec()
 
-		assert.Equal(
-			t,
-			[]string{
-				"test/a.txt",
-				"test/b.js",
-			},
-			zipFiles(t, filepath.Join(tmpDir, "test.zip")),
-		)
+		expectedFiles := []string{
+			"test/a.txt",
+			"test/b.js",
+		}
+
+		ensureContains(t, zipFiles(t, filepath.Join(tmpDir, "test.zip")), expectedFiles)
 
 	})
 
@@ -40,16 +38,15 @@ func TestPlugin(t *testing.T) {
 		}
 		p.Exec()
 
-		assert.Equal(
-			t,
-			[]string{
-				"test/a.txt",
-				"test/b.js",
-				"test/foo/a.js",
-				"test/foo/b.txt",
-				"test/foo/bar/bar.js"},
-			zipFiles(t, filepath.Join(tmpDir, "dot-test.zip")),
-		)
+		expectedFiles := []string{
+			"test/a.txt",
+			"test/b.js",
+			"test/foo/a.js",
+			"test/foo/b.txt",
+			"test/foo/bar/bar.js",
+		}
+
+		ensureContains(t, zipFiles(t, filepath.Join(tmpDir, "dot-test.zip")), expectedFiles)
 
 	})
 
@@ -62,17 +59,15 @@ func TestPlugin(t *testing.T) {
 		}
 		p.Exec()
 
-		assert.Equal(
-			t,
-			[]string{
-				"test/a.txt",
-				"test/b.js",
-				"test/foo/a.js",
-				"test/foo/b.txt",
-				"test/foo/bar/bar.js",
-			},
-			zipFiles(t, filepath.Join(tmpDir, "db-star-test.zip")),
-		)
+		expectedFiles := []string{
+			"test/a.txt",
+			"test/b.js",
+			"test/foo/a.js",
+			"test/foo/b.txt",
+			"test/foo/bar/bar.js",
+		}
+
+		ensureContains(t, zipFiles(t, filepath.Join(tmpDir, "db-star-test.zip")), expectedFiles)
 
 	})
 
@@ -85,15 +80,13 @@ func TestPlugin(t *testing.T) {
 		}
 		p.Exec()
 
-		assert.Equal(
-			t,
-			[]string{
-				"test/b.js",
-				"test/foo/a.js",
-				"test/foo/bar/bar.js",
-			},
-			zipFiles(t, filepath.Join(tmpDir, "db-star-js-test.zip")),
-		)
+		expectedFiles := []string{
+			"test/b.js",
+			"test/foo/a.js",
+			"test/foo/bar/bar.js",
+		}
+		ensureContains(t, zipFiles(t, filepath.Join(tmpDir, "db-star-js-test.zip")), expectedFiles)
+
 	})
 
 	t.Run("zip file ./test/**/*.txt", func(t *testing.T) {
@@ -105,14 +98,13 @@ func TestPlugin(t *testing.T) {
 		}
 		p.Exec()
 
-		assert.Equal(
-			t,
-			[]string{
-				"test/a.txt",
-				"test/foo/b.txt",
-			},
-			zipFiles(t, filepath.Join(tmpDir, "db-star-txt-test.zip")),
-		)
+		expectedFiles := []string{
+			"test/a.txt",
+			"test/foo/b.txt",
+		}
+
+		ensureContains(t, zipFiles(t, filepath.Join(tmpDir, "db-star-txt-test.zip")), expectedFiles)
+
 	})
 
 }
@@ -128,28 +120,27 @@ func TestOutput(t *testing.T) {
 		}
 		p.Exec()
 
-		assert.Equal(
-			t,
-			[]string{
-				"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/404.html",
-				"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/begriffe.html",
-				"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/datenschutz.html",
-				"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/feed_rss_created.xml",
-				"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/feed_rss_updated.xml",
-				"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/impressum.html",
-				"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/index.html",
-				"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/sitemap.xml",
-				"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/sitemap.xml.gz",
-				"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/rechtsformen/index.html",
-				"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/rechtsformen/test/1.html",
-				"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/rechtsformen/test/2.html",
-				"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/rechtsformen/test/3.html",
-				"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/rechtsformen/test/index.html",
-				"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/search/search_index.js",
-				"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/search/search_index.json",
-			},
-			zipFiles(t, filepath.Join(tmpDir, "output-9071a1942d0d334aa224a1370d98e18015782d6f.zip")),
-		)
+		expectedFiles := []string{
+			"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/404.html",
+			"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/begriffe.html",
+			"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/datenschutz.html",
+			"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/feed_rss_created.xml",
+			"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/feed_rss_updated.xml",
+			"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/impressum.html",
+			"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/index.html",
+			"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/sitemap.xml",
+			"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/sitemap.xml.gz",
+			"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/rechtsformen/index.html",
+			"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/rechtsformen/test/1.html",
+			"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/rechtsformen/test/2.html",
+			"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/rechtsformen/test/3.html",
+			"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/rechtsformen/test/index.html",
+			"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/search/search_index.js",
+			"test-output/output-9071a1942d0d334aa224a1370d98e18015782d6f/search/search_index.json",
+		}
+
+		ensureContains(t, zipFiles(t, filepath.Join(tmpDir, "output-9071a1942d0d334aa224a1370d98e18015782d6f.zip")), expectedFiles)
+
 	})
 }
 
@@ -173,6 +164,12 @@ func zipFiles(t *testing.T, path string) []string {
 		paths[i] = zf.Name
 	}
 	return paths
+}
+
+func ensureContains(t *testing.T, fileList []string, expectedFiles []string) {
+	for _, expectedFile := range expectedFiles {
+		assert.Contains(t, fileList, expectedFile)
+	}
 }
 
 func TestIsDir(t *testing.T) {
