@@ -41,7 +41,6 @@ func (p Plugin) Exec() error {
 
 func Zip(fileName string, inputList []string) {
 	fw, err := os.Create(fileName)
-
 	if err != nil {
 		logrus.Fatalf("create %s error: %v", fileName, err)
 	}
@@ -51,24 +50,30 @@ func Zip(fileName string, inputList []string) {
 	defer w.Close()
 
 	for _, input := range inputList {
-		targetFile, err := w.Create(input)
-		if err != nil {
-			logrus.Fatalf("create %s file error: %v", input, err)
+		if err := addFileToZip(w, input); err != nil {
+			logrus.Fatalf("%v", err)
 		}
-
-		sourceFile, err := os.Open(input)
-		if err != nil {
-			logrus.Fatalf("open %s file error: %v", input, err)
-		}
-		defer sourceFile.Close()
-
-		_, err = io.Copy(targetFile, sourceFile)
-		if err != nil {
-			logrus.Fatalf("compression %s file error: %v", input, err)
-		}
-
 		logrus.Infof("compression %s file success", input)
 	}
+}
+
+func addFileToZip(w *zip.Writer, input string) error {
+	targetFile, err := w.Create(input)
+	if err != nil {
+		logrus.Fatalf("create %s file error: %v", input, err)
+	}
+
+	sourceFile, err := os.Open(input)
+	if err != nil {
+		logrus.Fatalf("open %s file error: %v", input, err)
+	}
+
+	_, err = io.Copy(targetFile, sourceFile)
+	sourceFile.Close() // 手动关闭文件
+	if err != nil {
+		logrus.Fatalf("compression %s file error: %v", input, err)
+	}
+	return nil
 }
 
 func Contains(s []string, item string) bool {
