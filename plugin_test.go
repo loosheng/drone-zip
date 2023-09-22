@@ -189,25 +189,6 @@ func TestIsDir(t *testing.T) {
 
 }
 
-func TestContains(t *testing.T) {
-
-	t.Run("string slice contains", func(t *testing.T) {
-		assert.True(t, Contains([]string{"a", "b"}, "a"))
-		assert.True(t, Contains([]string{"a", "b"}, "b"))
-
-		assert.True(t, Contains([]string{"ab"}, "b"))
-		assert.True(t, Contains([]string{"ab"}, "a"))
-
-		assert.True(t, Contains([]string{"This is a sentence"}, "sentence"))
-		assert.True(t, Contains([]string{"This is a sentence"}, "sent"))
-	})
-
-	t.Run("string slice does not contains", func(t *testing.T) {
-		assert.False(t, Contains([]string{"a", "b"}, "c"))
-		assert.False(t, Contains([]string{"a", "b"}, "d"))
-	})
-}
-
 func TestGetFilePaths(t *testing.T) {
 	t.Run("glob match", func(t *testing.T) {
 

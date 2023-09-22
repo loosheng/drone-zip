@@ -5,7 +5,6 @@ import (
 	"math"
 	"os"
 	"runtime"
-	"strings"
 	"sync"
 
 	glob "github.com/bmatcuk/doublestar/v4"
@@ -47,15 +46,25 @@ func Zip(fileName string, inputList []string) {
 	if err != nil {
 		logrus.Fatalf("create %s error: %v", fileName, err)
 	}
-	defer fw.Close()
+	defer func(fw *os.File) {
+		err := fw.Close()
+		if err != nil {
+			logrus.Errorf("close %s error: %v", fileName, err)
+		}
+	}(fw)
 
 	w := zip.NewWriter(fw)
-	defer w.Close()
+	defer func(w *zip.Writer) {
+		err := w.Close()
+		if err != nil {
+			logrus.Errorf("close %s error: %v", fileName, err)
+		}
+	}(w)
 
 	// set maxGoroutines
 	cpu80Percent := int(math.Ceil(float64(runtime.NumCPU()) * 0.8))
 	fileCount := len(inputList)
-	maxGoroutines := min(cpu80Percent, fileCount)
+	maxGoroutines := getMin(cpu80Percent, fileCount)
 
 	sem := make(chan struct{}, maxGoroutines)
 	errCh := make(chan error, fileCount)
@@ -108,7 +117,12 @@ func addFileToZip(w *zip.Writer, filePath string) error {
 	if err != nil {
 		return err
 	}
-	defer sourceFile.Close()
+	defer func(sourceFile *os.File) {
+		err := sourceFile.Close()
+		if err != nil {
+
+		}
+	}(sourceFile)
 
 	_, err = io.Copy(targetFile, sourceFile)
 	if err != nil {
@@ -119,20 +133,11 @@ func addFileToZip(w *zip.Writer, filePath string) error {
 	return nil
 }
 
-func min(a, b int) int {
+func getMin(a, b int) int {
 	if a < b {
 		return a
 	}
 	return b
-}
-
-func Contains(s []string, item string) bool {
-	for _, str := range s {
-		if str == item || strings.Contains(str, item) {
-			return true
-		}
-	}
-	return false
 }
 
 func IsDir(path string) bool {
