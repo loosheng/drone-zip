@@ -4,10 +4,10 @@ go 1.18
 
 require (
 	github.com/bmatcuk/doublestar/v4 v4.6.0
-	github.com/klauspost/compress v1.15.14
-	github.com/sirupsen/logrus v1.9.0
-	github.com/stretchr/testify v1.8.1
-	github.com/urfave/cli v1.22.10
+	github.com/klauspost/compress v1.15.15
+	github.com/sirupsen/logrus v1.9.3
+	github.com/stretchr/testify v1.8.4
+	github.com/urfave/cli v1.22.14
 )
 
 require (
