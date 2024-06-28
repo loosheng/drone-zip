@@ -17,6 +17,8 @@ type Plugin struct {
 	Output string
 }
 
+var mutex = &sync.Mutex{}
+
 func (p Plugin) Exec() error {
 
 	if len(p.Input) == 0 {
@@ -108,6 +110,9 @@ func Zip(fileName string, inputList []string) {
 }
 
 func addFileToZip(w *zip.Writer, filePath string) error {
+	mutex.Lock()
+	defer mutex.Unlock()
+
 	targetFile, err := w.Create(filePath)
 	if err != nil {
 		return err
@@ -117,10 +122,10 @@ func addFileToZip(w *zip.Writer, filePath string) error {
 	if err != nil {
 		return err
 	}
+
 	defer func(sourceFile *os.File) {
 		err := sourceFile.Close()
 		if err != nil {
-
 		}
 	}(sourceFile)
 
