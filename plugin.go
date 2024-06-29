@@ -37,7 +37,10 @@ func (p Plugin) Exec() error {
 		filePath := getFilePaths(inputPath)
 		input = append(input, filePath...)
 	}
-	logrus.Infof("glob path: %s", input)
+
+	for _, inputPath := range input {
+		logrus.Infof("match file: %s", inputPath)
+	}
 
 	Zip(p.Output, input)
 	return nil
