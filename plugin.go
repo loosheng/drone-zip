@@ -15,7 +15,6 @@ type Plugin struct {
 	Output string
 }
 
-
 func (p Plugin) Exec() error {
 
 	if len(p.Input) == 0 {
@@ -99,7 +98,6 @@ func addFileToZip(w *zip.Writer, filePath string) error {
 	logrus.Infof("compression %s file success", filePath)
 	return nil
 }
-
 
 func IsDir(path string) bool {
 	info, err := os.Stat(path)

@@ -1,4 +1,4 @@
-FROM alpine
+FROM alpine:3.19
 
-ADD release/drone-zip-release /bin/
+ADD drone-zip-release /bin/
 ENTRYPOINT ["/bin/drone-zip-release"]
