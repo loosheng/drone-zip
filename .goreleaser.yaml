@@ -1,0 +1,83 @@
+# GoReleaser configuration for drone-zip
+# https://goreleaser.com
+
+version: 2
+
+before:
+  hooks:
+    - go mod tidy
+    - go mod verify
+    - go generate ./...
+
+builds:
+  - env:
+      - CGO_ENABLED=0
+    binary: drone-zip-release
+    goos:
+      - linux
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w -X main.version={{ .Version }}
+
+archives:
+  - name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+
+checksum:
+  name_template: 'checksums.txt'
+
+dockers:
+  - image_templates:
+      - "lunagod/drone-zip:{{ .Tag }}-amd64"
+      - "lunagod/drone-zip:latest-amd64"
+    use: buildx
+    dockerfile: Dockerfile
+    build_flag_templates:
+      - "--pull"
+      - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.created={{ .Date }}"
+      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
+      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+      - "--label=org.opencontainers.image.version={{ .Version }}"
+      - "--label=org.opencontainers.image.source=https://github.com/loosheng/drone-zip"
+    goarch: amd64
+
+  - image_templates:
+      - "lunagod/drone-zip:{{ .Tag }}-arm64"
+      - "lunagod/drone-zip:latest-arm64"
+    use: buildx
+    dockerfile: Dockerfile
+    build_flag_templates:
+      - "--pull"
+      - "--platform=linux/arm64"
+      - "--label=org.opencontainers.image.created={{ .Date }}"
+      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
+      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+      - "--label=org.opencontainers.image.version={{ .Version }}"
+      - "--label=org.opencontainers.image.source=https://github.com/loosheng/drone-zip"
+    goarch: arm64
+
+docker_manifests:
+  - name_template: "lunagod/drone-zip:{{ .Tag }}"
+    image_templates:
+      - "lunagod/drone-zip:{{ .Tag }}-amd64"
+      - "lunagod/drone-zip:{{ .Tag }}-arm64"
+  
+  - name_template: "lunagod/drone-zip:latest"
+    image_templates:
+      - "lunagod/drone-zip:latest-amd64"
+      - "lunagod/drone-zip:latest-arm64"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^ci:'
+
+release:
+  github:
+    owner: loosheng
+    name: drone-zip
