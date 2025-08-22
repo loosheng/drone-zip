@@ -192,10 +192,16 @@ func TestIsDir(t *testing.T) {
 func TestGetFilePaths(t *testing.T) {
 	t.Run("glob match", func(t *testing.T) {
 
-		assert.Equal(t, []string{"test/a.txt"}, getFilePaths("./test/a.txt"))
+		files, err := getFilePaths("./test/a.txt")
+		assert.NoError(t, err)
+		assert.Equal(t, []string{"test/a.txt"}, files)
 
-		assert.Equal(t, []string{"test/a.txt", "test/b.js"}, getFilePaths("./test/*"))
+		files, err = getFilePaths("./test/*")
+		assert.NoError(t, err)
+		assert.Equal(t, []string{"test/a.txt", "test/b.js"}, files)
 
+		files, err = getFilePaths("./test")
+		assert.NoError(t, err)
 		assert.Equal(t,
 			[]string{
 				"test/a.txt",
@@ -203,9 +209,11 @@ func TestGetFilePaths(t *testing.T) {
 				"test/foo/a.js",
 				"test/foo/b.txt",
 				"test/foo/bar/bar.js"},
-			getFilePaths("./test"),
+			files,
 		)
 
+		files, err = getFilePaths("./test/**")
+		assert.NoError(t, err)
 		assert.Equal(t,
 			[]string{
 				"test/a.txt",
@@ -213,9 +221,11 @@ func TestGetFilePaths(t *testing.T) {
 				"test/foo/a.js",
 				"test/foo/b.txt",
 				"test/foo/bar/bar.js"},
-			getFilePaths("./test/**"),
+			files,
 		)
 
+		files, err = getFilePaths("./test/**/*")
+		assert.NoError(t, err)
 		assert.Equal(t,
 			[]string{
 				"test/a.txt",
@@ -224,38 +234,46 @@ func TestGetFilePaths(t *testing.T) {
 				"test/foo/b.txt",
 				"test/foo/bar/bar.js",
 			},
-			getFilePaths("./test/**/*"),
+			files,
 		)
 
+		files, err = getFilePaths("./test/*.txt")
+		assert.NoError(t, err)
 		assert.Equal(t,
 			[]string{
 				"test/a.txt",
 			},
-			getFilePaths("./test/*.txt"),
+			files,
 		)
 
+		files, err = getFilePaths("./test/**/*.txt")
+		assert.NoError(t, err)
 		assert.Equal(t,
 			[]string{
 				"test/a.txt",
 				"test/foo/b.txt",
 			},
-			getFilePaths("./test/**/*.txt"),
+			files,
 		)
 
+		files, err = getFilePaths("./test/*.js")
+		assert.NoError(t, err)
 		assert.Equal(t,
 			[]string{
 				"test/b.js",
 			},
-			getFilePaths("./test/*.js"),
+			files,
 		)
 
+		files, err = getFilePaths("./test/**/*.js")
+		assert.NoError(t, err)
 		assert.Equal(t,
 			[]string{
 				"test/b.js",
 				"test/foo/a.js",
 				"test/foo/bar/bar.js",
 			},
-			getFilePaths("./test/**/*.js"),
+			files,
 		)
 
 	})

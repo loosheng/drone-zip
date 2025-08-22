@@ -1,11 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"io"
-	"math"
 	"os"
-	"runtime"
-	"sync"
 
 	glob "github.com/bmatcuk/doublestar/v4"
 	"github.com/klauspost/compress/zip"
@@ -17,16 +15,15 @@ type Plugin struct {
 	Output string
 }
 
-var mutex = &sync.Mutex{}
 
 func (p Plugin) Exec() error {
 
 	if len(p.Input) == 0 {
-		logrus.Fatalf("please enter the file or directory to be packed")
+		return fmt.Errorf("please enter the file or directory to be packed")
 	}
 
 	if p.Output == "" {
-		logrus.Fatalf("please enter the zip output path")
+		return fmt.Errorf("please enter the zip output path")
 	}
 
 	var (
@@ -34,7 +31,10 @@ func (p Plugin) Exec() error {
 	)
 
 	for _, inputPath := range p.Input {
-		filePath := getFilePaths(inputPath)
+		filePath, err := getFilePaths(inputPath)
+		if err != nil {
+			return err
+		}
 		input = append(input, filePath...)
 	}
 
@@ -42,14 +42,13 @@ func (p Plugin) Exec() error {
 		logrus.Infof("match file: %s", inputPath)
 	}
 
-	Zip(p.Output, input)
-	return nil
+	return Zip(p.Output, input)
 }
 
-func Zip(fileName string, inputList []string) {
+func Zip(fileName string, inputList []string) error {
 	fw, err := os.Create(fileName)
 	if err != nil {
-		logrus.Fatalf("create %s error: %v", fileName, err)
+		return fmt.Errorf("create %s error: %v", fileName, err)
 	}
 	defer func(fw *os.File) {
 		err := fw.Close()
@@ -66,55 +65,15 @@ func Zip(fileName string, inputList []string) {
 		}
 	}(w)
 
-	// set maxGoroutines
-	cpu80Percent := int(math.Ceil(float64(runtime.NumCPU()) * 0.8))
-	fileCount := len(inputList)
-	maxGoroutines := getMin(cpu80Percent, fileCount)
-
-	sem := make(chan struct{}, maxGoroutines)
-	errCh := make(chan error, fileCount)
-	quit := make(chan struct{})
-	wg := &sync.WaitGroup{}
-
-	for _, input := range inputList {
-		select {
-		case <-quit:
-			return
-		default:
-			wg.Add(1)
-			sem <- struct{}{}
-
-			go func(filePath string) {
-				defer wg.Done()
-				defer func() { <-sem }() // Release semaphore.
-
-				if err := addFileToZip(w, filePath); err != nil {
-					select {
-					case errCh <- err:
-					case <-quit: // If other goroutines have already detected an error, do not send.
-					}
-				}
-			}(input)
+	for _, filePath := range inputList {
+		if err := addFileToZip(w, filePath); err != nil {
+			return err
 		}
 	}
-
-	go func() {
-		wg.Wait()
-		close(errCh)
-	}()
-
-	for err := range errCh {
-		if err != nil {
-			close(quit) // When an error is detected, notify all goroutines to stop.
-			logrus.Fatalf("%v", err)
-			return
-		}
-	}
+	return nil
 }
 
 func addFileToZip(w *zip.Writer, filePath string) error {
-	mutex.Lock()
-	defer mutex.Unlock()
 
 	targetFile, err := w.Create(filePath)
 	if err != nil {
@@ -141,12 +100,6 @@ func addFileToZip(w *zip.Writer, filePath string) error {
 	return nil
 }
 
-func getMin(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
 
 func IsDir(path string) bool {
 	info, err := os.Stat(path)
@@ -156,7 +109,7 @@ func IsDir(path string) bool {
 	return info.Mode().IsDir()
 }
 
-func getFilePaths(path string) []string {
+func getFilePaths(path string) ([]string, error) {
 	var paths, resultPaths []string
 	var patternPath string
 
@@ -168,7 +121,7 @@ func getFilePaths(path string) []string {
 
 	globedPaths, err := glob.FilepathGlob(patternPath)
 	if err != nil {
-		logrus.Fatalf("glob error: %v", err)
+		return nil, fmt.Errorf("glob error: %v", err)
 	}
 
 	paths = append(paths, globedPaths...)
@@ -180,5 +133,5 @@ func getFilePaths(path string) []string {
 		}
 	}
 
-	return resultPaths
+	return resultPaths, nil
 }
