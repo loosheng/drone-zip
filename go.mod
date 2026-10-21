@@ -1,10 +1,10 @@
 module drone-zip
 
-go 1.18
+go 1.24
 
 require (
 	github.com/bmatcuk/doublestar/v4 v4.6.0
-	github.com/klauspost/compress v1.15.15
+	github.com/klauspost/compress v1.18.7
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.8.4
 	github.com/urfave/cli v1.22.14
